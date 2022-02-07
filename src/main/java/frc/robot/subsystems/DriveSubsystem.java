@@ -72,16 +72,16 @@ public class DriveSubsystem extends SubsystemBase {
     // gearbox is constructed, you might have to invert the left side instead.
     m_rightMotors.setInverted(true);
 
-    resetEncoders();
+    resetRobot();
+
     m_odometry = new DifferentialDriveOdometry(m_gyro.getRotation2d());
   }
 
-  @Override
-  public void periodic() {
-    // Update the odometry in the periodic block
-    m_odometry.update(
-        m_gyro.getRotation2d(), m_leftMotor1.getSelectedSensorPosition(), m_rightMotor1.getSelectedSensorPosition());
+  public void resetRobot() {
+    resetEncoders();
+    zeroHeading();
   }
+
 
   /**
    * Returns the currently-estimated pose of the robot.
@@ -145,7 +145,7 @@ public class DriveSubsystem extends SubsystemBase {
    * @return the average of the two encoder readings
    */
   public double getAverageEncoderDistance() {
-    return (m_leftMotor1.getSelectedSensorPosition() + m_rightMotor1.getSelectedSensorPosition()) / 2.0;
+    return (m_leftMotor1.getSelectedSensorPosition() - m_rightMotor1.getSelectedSensorPosition()) / 2.0;
   }
 
   /**
@@ -179,5 +179,12 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getTurnRate() {
     return -m_gyro.getRate();
+  }
+  
+  @Override
+  public void periodic() {
+    // Update the odometry in the periodic block
+    m_odometry.update(
+        m_gyro.getRotation2d(), m_leftMotor1.getSelectedSensorPosition(), m_rightMotor1.getSelectedSensorPosition());
   }
 }
